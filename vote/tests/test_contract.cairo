@@ -1,45 +1,50 @@
 use snforge_std::{ContractClassTrait, DeclareResultTrait, declare};
-use starknet::ContractAddress;
 use vote::{
-    IVoteStarknetDispatcher, IVoteStarknetDispatcherTrait, IVoteStarknetSafeDispatcher,
-    IVoteStarknetSafeDispatcherTrait,
+    IVotingStarknetV3Dispatcher, IVotingStarknetV3DispatcherTrait, IVotingStarknetV3SafeDispatcher,
 };
 
-fn deploy_contract(name: ByteArray) -> ContractAddress {
-    let contract = declare(name).unwrap().contract_class();
-    let (contract_address, _) = contract.deploy(@ArrayTrait::new()).unwrap();
-    contract_address
+fn deploy_contract(
+    init_value: u128, proposals: usize,
+) -> (IVotingStarknetV3Dispatcher, IVotingStarknetV3SafeDispatcher) {
+    let contract = declare("VotingStarknetV3").unwrap().contract_class();
+
+    let mut calldata = array![];
+
+    init_value.serialize(ref calldata);
+    proposals.serialize(ref calldata);
+
+    let (contract_address, _) = contract.deploy(@calldata).unwrap();
+
+    let dispatcher = IVotingStarknetV3Dispatcher { contract_address };
+    let safe_dispatcher = IVotingStarknetV3SafeDispatcher { contract_address };
+
+    (dispatcher, safe_dispatcher)
+}
+
+fn initialize() -> IVotingStarknetV3Dispatcher {
+    let init_value: u128 = 0;
+    let proposals: usize = 0;
+
+    let (dispatcher, _) = deploy_contract(init_value, proposals);
+
+    dispatcher
 }
 
 #[test]
 fn test_create_proposal() {
-    let contract_address = deploy_contract("VoteStarknet");
+    let dispatcher = initialize();
+    let balance = dispatcher.get_staked_tokens_from_current_addr();
 
-    let dispatcher = IVoteStarknetDispatcher { contract_address };
+    if (balance == 0) {
+        dispatcher.stake_tokens();
+    }
 
-    let balance_before = dispatcher.get_balance();
-    assert(balance_before == 0, 'Invalid balance');
-
-    dispatcher.create_a_proposal('', 0);
-
-    let balance_after = dispatcher.get_balance();
-    assert(balance_after == 42, 'Invalid balance');
+    dispatcher.create_a_proposal('Genesis');
 }
 
 #[test]
-#[feature("safe_dispatcher")]
-fn test_cannot_vote_for_a_proposal_with_zero_value() {
-    let contract_address = deploy_contract("VoteStarknet");
+fn test_vote_on_proposal() {
+    let dispatcher = initialize();
 
-    let safe_dispatcher = IVoteStarknetSafeDispatcher { contract_address };
-
-    let balance_before = safe_dispatcher.get_balance().unwrap();
-    assert(balance_before == 0, 'Invalid balance');
-
-    match safe_dispatcher.stake_tokens(0) {
-        Result::Ok(_) => core::panic_with_felt252('Should have panicked'),
-        Result::Err(panic_data) => {
-            assert(*panic_data.at(0) == 'Amount cannot be 0', *panic_data.at(0));
-        },
-    };
+    dispatcher.vote_on_proposals('Genesis');
 }
