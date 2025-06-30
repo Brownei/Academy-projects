@@ -11,21 +11,31 @@ import TokensRequest from "~/components/tokens-request"
 import { CONTRACT_ADDRESS } from "~/lib/constants"
 
 export default function Welcome() {
+  const [balance, setBalance] = useState(0);
   const { address } = useAccount();
   const { data: readData, refetch: dataRefetch, isError: readIsError, isLoading: readIsLoading, error: readError } = useReadContract({
-    functionName: "get_staked_tokens_from_current_addr",
+    functionName: "get_tokens",
     args: undefined,
     abi: ABI as Abi,
-    address: CONTRACT_ADDRESS,
+    address: address,
     watch: true,
     refetchInterval: 1000
   });
 
   useEffect(() => {
     dataRefetch()
-  }, [])
+  }, [balance])
 
-  console.log({ readData: readData?.toString(), readError })
+  useEffect(() => {
+    if (!readIsLoading && address) {
+      const wei = parseInt(readData?.toString(), 32).toString().slice(0, 2);
+      setBalance(Number(wei))
+    } else if (readIsError) {
+      setBalance(0)
+    }
+  }, [readIsError, readIsLoading, address])
+
+  console.log({ readData: parseInt(readData?.toString(), 32), readIsError, readError })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
@@ -72,7 +82,13 @@ export default function Welcome() {
                 <FileStack className="h-5 w-5 text-green-600" />
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Stake Amount Left</p>
-                  <p className="text-2xl font-bold">{readIsLoading || readData === undefined ? 0 : readData!}</p>
+                  <p className="text-2xl font-bold">{balance}</p>
+                  <button
+                    onClick={() => dataRefetch()}
+                    className="mt-2 border border-black text-black font-regular py-1 px-3 bg-yellow-300 hover:bg-yellow-500"
+                  >
+                    Refresh
+                  </button>
                 </div>
               </div>
             </CardContent>

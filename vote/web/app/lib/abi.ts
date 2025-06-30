@@ -1,11 +1,11 @@
 export const ABI = [
   {
-    "name": "VotingStarknetV3Impl",
+    "name": "VotingStarknetV4Impl",
     "type": "impl",
-    "interface_name": "vote::IVotingStarknetV3"
+    "interface_name": "vote::IVotingStarknetV4"
   },
   {
-    "name": "vote::IVotingStarknetV3",
+    "name": "vote::IVotingStarknetV4",
     "type": "interface",
     "items": [
       {
@@ -45,13 +45,40 @@ export const ABI = [
         "inputs": [],
         "outputs": [
           {
-            "type": "core::integer::u128"
+            "type": "core::integer::u32"
           }
         ],
         "state_mutability": "view"
       },
       {
         "name": "get_total_proposals_by_name",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "name",
+            "type": "core::felt252"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "get_tokens",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "get_proposals_made_by_addr_through_name",
         "type": "function",
         "inputs": [
           {
@@ -85,7 +112,7 @@ export const ABI = [
     "inputs": [
       {
         "name": "init_value",
-        "type": "core::integer::u128"
+        "type": "core::integer::u32"
       },
       {
         "name": "proposals",
@@ -94,9 +121,112 @@ export const ABI = [
     ]
   },
   {
-    "kind": "enum",
-    "name": "vote::VotingStarknetV3::Event",
+    "kind": "struct",
+    "name": "vote::VotingStarknetV4::TokenIncrease",
     "type": "event",
-    "variants": []
+    "members": [
+      {
+        "kind": "data",
+        "name": "tokens",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "kind": "struct",
+    "name": "vote::VotingStarknetV4::TokenDecrease",
+    "type": "event",
+    "members": [
+      {
+        "kind": "data",
+        "name": "tokens",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "kind": "struct",
+    "name": "vote::VotingStarknetV4::StakedTokensIncrease",
+    "type": "event",
+    "members": [
+      {
+        "kind": "data",
+        "name": "tokens",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "kind": "struct",
+    "name": "vote::VotingStarknetV4::StakedTokensDecrease",
+    "type": "event",
+    "members": [
+      {
+        "kind": "data",
+        "name": "tokens",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "kind": "struct",
+    "name": "vote::VotingStarknetV4::AllVotesIncrease",
+    "type": "event",
+    "members": [
+      {
+        "kind": "data",
+        "name": "all_votes",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "kind": "struct",
+    "name": "vote::VotingStarknetV4::AllProposalIncrease",
+    "type": "event",
+    "members": [
+      {
+        "kind": "data",
+        "name": "all_proposals",
+        "type": "core::integer::u32"
+      }
+    ]
+  },
+  {
+    "kind": "enum",
+    "name": "vote::VotingStarknetV4::Event",
+    "type": "event",
+    "variants": [
+      {
+        "kind": "nested",
+        "name": "TokenIncrease",
+        "type": "vote::VotingStarknetV4::TokenIncrease"
+      },
+      {
+        "kind": "nested",
+        "name": "TokenDecrease",
+        "type": "vote::VotingStarknetV4::TokenDecrease"
+      },
+      {
+        "kind": "nested",
+        "name": "StakedTokensIncrease",
+        "type": "vote::VotingStarknetV4::StakedTokensIncrease"
+      },
+      {
+        "kind": "nested",
+        "name": "StakedTokensDecrease",
+        "type": "vote::VotingStarknetV4::StakedTokensDecrease"
+      },
+      {
+        "kind": "nested",
+        "name": "AllVotesIncrease",
+        "type": "vote::VotingStarknetV4::AllVotesIncrease"
+      },
+      {
+        "kind": "nested",
+        "name": "AllProposalIncrease",
+        "type": "vote::VotingStarknetV4::AllProposalIncrease"
+      }
+    ]
   }
 ] as const

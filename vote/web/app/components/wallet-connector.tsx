@@ -40,7 +40,7 @@ export function WalletConnect() {
               onClick={() => connect({ connector })}
               className="bg-black hover:bg-black/80 text-white capitalize font-semibold"
             >
-              <img className="size-[25px] rounded-full" src={`${connector.id === "braavos" ? "../../public/bravoos.jpeg" : "../../public/ready.png"}`} />
+              <img className="size-[25px] rounded-full" src={`${connector.id === "braavos" ? "/bravoos.jpeg" : "/ready.png"}`} />
               Connect {connector.id}
             </Button>
           ))}
